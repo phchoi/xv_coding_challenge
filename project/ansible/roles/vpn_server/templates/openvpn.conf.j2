@@ -1,0 +1,23 @@
+# {{ ansible_managed }}
+
+port {{ item['port'] }}
+proto {{ item['proto'] }}
+dev tun
+ca {{ keys_dir }}/ca.crt
+cert {{ keys_dir }}/{{ vpn_endpoint }}.crt
+key {{ keys_dir }}/{{ vpn_endpoint }}.key
+dh {{ openvpn_dir }}/dh{{ dh_param }}.pem
+server {{ item['subnet'] }} {{ item['subnet_mask'] }}
+ifconfig-pool-persist ipp.txt
+push "redirect-gateway def1 bypass-dhcp"
+{% for dns in openvpn_dns_server %}
+push "dhcp-option DNS {{ dns }}"
+{% endfor %}
+keepalive 10 120
+comp-lzo
+user nobody
+group nogroup
+persist-key
+persist-tun
+status {{ log_dir }}/openvpn-status-{{ item['name'] }}.log
+verb 3

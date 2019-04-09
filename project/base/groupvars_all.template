@@ -1,0 +1,20 @@
+---
+create_new_ca: true
+create_new_server_cert: true
+create_new_client_cert: true
+openvpn_dir: /etc/openvpn
+easyrsa_dir: "{{ openvpn_dir }}/easy-rsa"
+keys_dir: "{{ easyrsa_dir }}/keys"
+ca_key_env:
+  KEY_COUNTRY: "HK"
+  KEY_PROVINCE: "HK"
+  KEY_CITY: "'Hong Kong'"
+  KEY_ORG: "XVPN"
+  KEY_EMAIL: "xvpn@xvpn.com"
+  KEY_NAME: "XVPN"
+  KEY_OU: "XVPN"
+vpn_endpoint: vpn.xvpn.com
+client_key: client1
+openvpn_dns_server:
+- 208.67.222.222
+- 208.67.220.220

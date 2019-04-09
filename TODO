@@ -1,0 +1,8 @@
+TODO:
+
+- the vpn test script itself (under project/ansible/roles/vpn_client/files/vpn_test.py) still have a bunch of items to optimize and improve, refer to the TODO on the script.
+- the dynamic inventory script (under project/inventory.py) is not yet completed, it didn't handle the ansible groups yet. Thats why the playbooks will be run against indivdual node instead of group.
+- the playbook suppose to be able handle 1) create CA/Server/Client cert from scratch or 2) store the Cert into repository and push it to nodes. But the logic is not yet implemented. Right now it is creating the cert on the fly.
+- not enough playbook description/comments
+- security maybe, particular tightenly on iptables rules, though dont' really have much idea yet.
+- Not really a TODO item, but there were some weirdness behavior with Virtualbox and Openvpn UDP implementation which gave me a very unstable test result (though the UDP tunnel is up all the time but on-and-off it is just not passing the traffic, pretty random). Luckily I didnt see it in the physical nodes but I can't really tell if it is my configuration file issue or just virtualbox issue. Didn't get a chance to test in other environment.

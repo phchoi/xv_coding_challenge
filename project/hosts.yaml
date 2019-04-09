@@ -1,0 +1,21 @@
+---
+all:
+  hosts:
+  - vpn-client1
+  - vpn-server1
+  - mgmt
+
+_meta:
+  hostvars:
+    mgmt:
+      ip_address: "127.0.0.1"
+      groups:
+      - mgmt
+    vpn-client1:
+      ip_address: "139.162.46.90"
+      groups:
+      - client
+    vpn-server1:
+      ip_address: "139.162.39.177"
+      groups:
+      - server

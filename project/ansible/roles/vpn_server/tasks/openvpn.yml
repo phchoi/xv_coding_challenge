@@ -1,0 +1,54 @@
+---
+- name: set /proc/sys/net/ipv4/ip_forward equal to 1
+  sysctl: name=net.ipv4.ip_forward value=1 state=present reload=yes
+
+- name: create {{ log_dir }}
+  file: path={{ log_dir }} state=directory
+
+- name: generate openvpn server config file
+  template: src="openvpn.conf.j2" dest="{{ openvpn_dir }}/{{ item['name'] }}.conf"
+  with_items: "{{ instances }}"
+
+#- name: rsync /usr/share/easy-rsa to /etc/openvpn/
+#  synchronize:
+#    src: /usr/share/easy-rsa
+#    dest: "{{ openvpn_dir }}/"
+#    recursive: yes
+#  delegate_to: "{{ inventory_hostname }}"
+
+- name: create {{ key_dir }}
+  file: path={{ keys_dir }} state=directory
+
+- name: check if DH parameter file exist
+  stat: path="{{ openvpn_dir }}/dh{{ dh_param }}.pem"
+  register: dh_file
+
+- fail: msg="DH file path is not a regular file, check /etc/openvpn/dh*.pem"
+  when: dh_file.stat.exists == true and dh_file.stat.isreg == false
+
+- name: check if existing DH param file is valid
+  command: openssl dhparam -in /etc/openvpn/dh"{{ dh_param }}.pem" -check -noout
+  when: dh_file.stat.exists == true and dh_file.stat.isreg == true
+  register: check_dh_file
+
+- fail: msg="DH file exists but it is not a valid one, pls check"
+  when: check_dh_file is defined and check_dh_file.rc != 0
+
+- name: create dh file if it is not there (gonna take a while)
+  command: "openssl dhparam -out /etc/openvpn/dh{{ dh_param }}.pem {{ dh_param }}"
+  when: dh_file.stat.exists == false
+
+- name: push ca.crt
+  copy: src="{{ keys_dir }}/ca.crt" dest="{{ keys_dir }}/" owner=root group=root mode=0644
+
+- name: push endpoint key and cert
+  copy: src="{{ keys_dir }}/{{ vpn_endpoint }}.{{ item }}" dest="{{ keys_dir }}/" owner=root group=root mode=0644
+  with_items:
+    - key
+    - crt
+
+- name: enable openvpn service
+  service: name=openvpn enabled=yes
+
+- name: restart openvpn service
+  service: name=openvpn state=restarted

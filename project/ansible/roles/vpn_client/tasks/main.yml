@@ -1,0 +1,28 @@
+---
+- name: create {{ log_dir }}
+  file: path={{ log_dir }} state=directory
+
+- name: generate openvpn client config 
+  template: src="vpn_client.ovpn.j2" dest="{{ openvpn_dir }}/{{ item['name'] }}.ovpn"
+  with_items: "{{ instances }}"
+
+- name: create {{ key_dir }}
+  file: path={{ keys_dir }} state=directory
+
+- name: push ca.crt
+  copy: src="{{ keys_dir }}/ca.crt" dest="{{ keys_dir }}/" owner=root group=root mode=0644
+
+- name: push client key
+  copy: src="{{ keys_dir }}/{{ client_key }}.key" dest="{{ keys_dir }}/" owner=root group=root mode=0644
+
+- name: push client cert
+  copy: src="{{ keys_dir }}/{{ client_key }}.crt" dest="{{ keys_dir }}/" owner=root group=root mode=0644
+
+- name: push vpn_test.py
+  copy: src=vpn_test.py dest=/root/vpn_test.py mode=0755 owner=root group=root
+
+- name: vpn_test_wrapper.sh
+  copy: src=vpn_test_wrapper.sh dest=/root/ mode=0755 owner=root group=root
+
+- name: push cron_vpn_test
+  copy: src=cron_vpn_test dest=/etc/cron.d/ mode=0644 owner=root group=root

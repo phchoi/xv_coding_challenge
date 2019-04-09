@@ -1,0 +1,23 @@
+client
+dev tun
+proto {{ item['proto'] }}
+remote {{ item['vpn_server_ip'] }} {{ item['port'] }}
+#remote 192.168.0.202 1193
+resolv-retry infinite
+nobind
+# taking our noboy/nogroup to allow /etc/openvpn/update-resolv.conf to works
+# otherwise it will complain with permission denied
+# not able to tighten the security for now
+#user nobody
+#group nogroup
+persist-key
+persist-tun
+ca {{ keys_dir }}/ca.crt
+cert {{ keys_dir }}/client1.crt
+key {{ keys_dir }}/client1.key
+ns-cert-type server
+comp-lzo
+verb 3
+script-security 2
+up {{ openvpn_dir }}/update-resolv-conf
+down {{ openvpn_dir }}/update-resolv-conf

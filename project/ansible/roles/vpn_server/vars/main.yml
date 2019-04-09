@@ -1,0 +1,3 @@
+---
+dh_param: 2048
+log_dir: /var/log/openvpn

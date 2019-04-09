@@ -1,0 +1,13 @@
+---
+- name: set hostname
+  hostname: name="{{ inventory_hostname }}"
+
+- name: install packages
+  apt: name="{{ item }}" state=latest
+  with_items: "{{ packages }}"
+
+- name: enable chrony ntp client
+  service: name=chrony state=started
+
+- name: scp /etc/hosts
+  copy: src=/etc/hosts dest=/etc/hosts owner=root group=root mode=0644

@@ -1,0 +1,14 @@
+instruction
+
+requirements: 
+- the ansible management node need to be an vanilia ubuntu box and require root access. 
+  as in this setup I will be using this ansible node to prepare the host files, CA crt/key, server crt/key and client crt/key.
+
+1. cd projects
+2. update hosts.yaml with the vpn-client1 and vpn-server1 ip address
+3. update config.file with the ip address information as well
+4. run ./provision_ansible_node.sh (this will prepare the ansible management node and configure the ansible invnentory)
+5. run ./create_groupvars_all.py (this will propagate the group vars variables for the site setup)
+6. run ./ansible-playbook ansible/all.yaml
+7. If everythings are clean (see attached sample_output_from_playbook.txt), you will now have both vpn server and vpn client configured.
+8. Login to vpn client, go to /var/log/vpn_test_result.log. The test result of vpn connectivitiy tests are there.

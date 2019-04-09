@@ -1,0 +1,6 @@
+--- 
+# rules are not really tightened up yet, just bring it up ufw so we can have NAT to work
+- include: ufw.yml
+
+# setup all openvpn related config
+- include: openvpn.yml

@@ -1,0 +1,42 @@
+---
+create_new_ca: true
+create_new_server_cert: true
+create_new_client_cert: true
+openvpn_dir: /etc/openvpn
+easyrsa_dir: "{{ openvpn_dir }}/easy-rsa"
+keys_dir: "{{ easyrsa_dir }}/keys"
+ca_key_env:
+  KEY_COUNTRY: "HK"
+  KEY_PROVINCE: "HK"
+  KEY_CITY: "'Hong Kong'"
+  KEY_ORG: "XVPN"
+  KEY_EMAIL: "xvpn@xvpn.com"
+  KEY_NAME: "XVPN"
+  KEY_OU: "XVPN"
+vpn_endpoint: vpn.xvpn.com
+client_key: client1
+openvpn_dns_server:
+- 208.67.222.222
+- 208.67.220.220
+instances:
+  - name: instance1
+    vpn_server_ip: 139.162.39.177
+    subnet: 10.10.0.0
+    subnet_mask: 255.255.0.0
+    subnet_mask_bit: 16
+    proto: udp
+    port: 1194
+  - name: instance2
+    vpn_server_ip: 139.162.39.177
+    subnet: 10.11.0.0
+    subnet_mask: 255.255.0.0
+    subnet_mask_bit: 16
+    proto: udp
+    port: 1198
+  - name: instance3
+    vpn_server_ip: 139.162.39.177
+    subnet: 10.12.0.0
+    subnet_mask: 255.255.0.0
+    subnet_mask_bit: 16
+    proto: tcp
+    port: 443

@@ -1,0 +1,12 @@
+---
+# provision the ansible management host itself first
+- include: mgmt.yaml
+
+# pre-configure the nodes before moving to install role specific configuration
+- include: provision.yaml
+
+# run configuration on vpn server node
+- include: vpn_server.yaml
+
+# run configuration on vpn client node
+- include: vpn_client.yaml

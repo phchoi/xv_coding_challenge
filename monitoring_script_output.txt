@@ -1,0 +1,27 @@
+root@vpn-client1:~# python /root/vpn_test.py 
+usage: vpn_test.py [-h] [-c CONFIG] [-u URL] [-d DNS] [-i INTERVAL] [-t TRIES]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -c CONFIG, --config CONFIG
+                        Openvpn client config, default:
+                        /etc/openvpn/client.ovpn
+  -u URL, --url URL     URL to test, default: www.google.com
+  -d DNS, --dns DNS     DNS name to test, default: www.google.com
+  -i INTERVAL, --interval INTERVAL
+                        Retry interval upon connection failure, default: 10
+                        secs
+  -t TRIES, --tries TRIES
+                        Number of total tries upon connection failure,
+                        default: 3 times
+
+
+
+root@vpn-client1:~# python /root/vpn_test.py --config /etc/openvpn/instance3.ovpn 
+17:28:33 05/02/16 UTC INFO: Starting 1 out of 3 tries with profile /etc/openvpn/instance2.ovpn ... 
+17:28:35 05/02/16 UTC INFO: Mon May  2 17:28:35 2016 Initialization Sequence Completed
+17:28:35 05/02/16 UTC INFO: VPN profile /etc/openvpn/instance2.ovpn connected successfully in 2.38063716888 secs
+17:28:35 05/02/16 UTC INFO: DNS www.google.com resolved successfully in 0.00142002105713 secs
+17:28:36 05/02/16 UTC INFO: Successfully fetched http://www.google.com in 0.142956018448 secs. Return code 200 Data size 4902 bytes
+17:28:36 05/02/16 UTC INFO: Test completed in 2.52448511124 secs
+

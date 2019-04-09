@@ -1,0 +1,6 @@
+---
+packages:
+- openvpn
+- easy-rsa
+- chrony
+- rsync

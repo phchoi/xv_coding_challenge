@@ -1,0 +1,7 @@
+---
+- name: get inventory
+  command: /etc/ansible/inventory.py --list
+  register: inventory
+
+- name: generate file
+  template: src="etc_hosts.j2" dest="/etc/hosts"

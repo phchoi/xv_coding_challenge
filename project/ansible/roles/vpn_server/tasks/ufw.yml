@@ -1,0 +1,19 @@
+---
+- name: setup ufw default policy to accept
+  lineinfile: dest="/etc/default/ufw" regexp="^DEFAULT_FORWARD_POLICY" line='DEFAULT_FORWARD_POLICY="ACCEPT"'
+
+#- name: setup ufw default policy to accept
+#  lineinfile: dest="/etc/default/ufw" regexp="^DEFAULT_INPUT_POLICY" line='DEFAULT_INPUT_POLICY="ACCEPT"'
+
+- name: allow ssh in ufw
+  command: "ufw allow ssh"
+
+- name: allow vpn port in ufw
+  command: "ufw allow {{ item['port'] }}/{{ item['proto'] }}"
+  with_items: "{{ instances }}"
+
+- name: setup ufw /etc/ufw/before.rules file
+  template: src="ufw_before_rules.j2" dest=/etc/ufw/before.rules
+
+- name: enable ufw
+  command: "ufw --force enable"

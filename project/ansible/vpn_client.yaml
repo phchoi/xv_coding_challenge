@@ -1,0 +1,4 @@
+---
+- hosts: vpn-client1
+  roles:
+    - vpn_client

@@ -1,0 +1,6 @@
+---
+- hosts: mgmt
+  roles:
+    - hosts_file
+    - mgmt
+  connection: local

@@ -1,0 +1,51 @@
+- name: install packages
+  apt: name={{ item }} state=latest
+  with_items: "{{ packages }}"
+
+- name: enable chrony ntp client
+  service: name=chrony state=started
+
+- name: setup openvpn directory
+  file: path="{{ openvpn_dir }}" state=directory
+
+- name: setup easy-rsa directory
+  synchronize:
+    src: /usr/share/easy-rsa/
+    dest: "{{ easyrsa_dir }}"
+    recursive: yes
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: problem with original pkitool in batch mode, drop in patched pkitool 
+  copy: src=pkitool dest="{{ easyrsa_dir }}/pkitool" mode=0755 backup=yes
+
+- name: setup key directory
+  file: path="{{ keys_dir }}" state=directory
+
+- name: clean key directory 
+  shell: ". ./vars ; {{ easyrsa_dir }}/clean-all"
+  args: 
+    chdir: "{{ easyrsa_dir }}"
+  when: "{{ create_new_ca }}"
+
+- name: propagate new CA variable
+  lineinfile: dest="{{ easyrsa_dir }}/vars" regexp="^export {{ item.key }}" line="export {{ item.key }}={{ item.value }}"
+  with_dict: "{{ ca_key_env }}"
+  when: "{{ create_new_ca }}"
+
+- name: build-ca key and cert
+  shell: ". ./vars ; {{ easyrsa_dir }}/pkitool --initca"
+  args: 
+    chdir: "{{ easyrsa_dir }}"
+  when: "{{ create_new_ca }}"
+
+- name: build server key and cert
+  shell: ". ./vars ; export KEY_CN={{ vpn_endpoint }} ; {{ easyrsa_dir }}/pkitool --server {{ vpn_endpoint }}"
+  args: 
+    chdir: "{{ easyrsa_dir }}"
+  when: ("{{ create_new_ca }}") and ("{{ create_new_server_cert }}")
+
+- name: build client key and cert
+  shell: ". ./vars; {{ easyrsa_dir }}/pkitool {{ client_key }}"
+  args: 
+    chdir: "{{ easyrsa_dir }}"
+

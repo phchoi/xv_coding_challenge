@@ -1,0 +1,189 @@
+
+root@ubuntu:~/project# ansible --private-key=/root/.ssh/a -m shell -a 'uptime' '*'
+mgmt | success | rc=0 >>
+ 00:04:07 up 48 min,  3 users,  load average: 0.01, 0.03, 0.05
+
+vpn-client1 | success | rc=0 >>
+ 16:04:26 up 6 days,  9:33,  2 users,  load average: 0.00, 0.01, 0.05
+
+vpn-server1 | success | rc=0 >>
+ 16:04:15 up 6 days,  9:33,  1 user,  load average: 0.00, 0.01, 0.05
+
+
+
+root@ubuntu:~/project# ansible-playbook --private-key=/root/.ssh/a ansible/all.yaml 
+ [WARNING]: It is unneccessary to use '{{' in loops, leave variables in loop
+expressions bare.
+
+ [WARNING]: It is unneccessary to use '{{' in conditionals, leave variables in
+loop expressions bare.
+
+
+PLAY [mgmt] ******************************************************************* 
+
+GATHERING FACTS *************************************************************** 
+ok: [mgmt]
+
+TASK: [hosts_file | get inventory] ******************************************** 
+changed: [mgmt]
+
+TASK: [hosts_file | generate file] ******************************************** 
+ok: [mgmt]
+
+TASK: [mgmt | install packages] *********************************************** 
+ok: [mgmt] => (item=easy-rsa,chrony)
+
+TASK: [mgmt | enable chrony ntp client] *************************************** 
+ok: [mgmt]
+
+TASK: [mgmt | setup openvpn directory] **************************************** 
+ok: [mgmt]
+
+TASK: [mgmt | setup easy-rsa directory] *************************************** 
+changed: [mgmt]
+
+TASK: [mgmt | problem with original pkitool in batch mode, drop in patched pkitool] *** 
+changed: [mgmt]
+
+TASK: [mgmt | setup key directory] ******************************************** 
+ok: [mgmt]
+
+TASK: [mgmt | clean key directory] ******************************************** 
+changed: [mgmt]
+
+TASK: [mgmt | propagate new CA variable] ************************************** 
+changed: [mgmt] => (item={'value': 'HK', 'key': 'KEY_PROVINCE'})
+changed: [mgmt] => (item={'value': 'HK', 'key': 'KEY_COUNTRY'})
+changed: [mgmt] => (item={'value': 'XVPN', 'key': 'KEY_NAME'})
+changed: [mgmt] => (item={'value': "'Hong Kong'", 'key': 'KEY_CITY'})
+changed: [mgmt] => (item={'value': 'xvpn@xvpn.com', 'key': 'KEY_EMAIL'})
+changed: [mgmt] => (item={'value': 'XVPN', 'key': 'KEY_ORG'})
+changed: [mgmt] => (item={'value': 'XVPN', 'key': 'KEY_OU'})
+
+TASK: [mgmt | build-ca key and cert] ****************************************** 
+changed: [mgmt]
+
+TASK: [mgmt | build server key and cert] ************************************** 
+changed: [mgmt]
+
+TASK: [mgmt | build client key and cert] ************************************** 
+changed: [mgmt]
+
+PLAY [vpn-server1:vpn-client1] ************************************************ 
+
+GATHERING FACTS *************************************************************** 
+ok: [vpn-server1]
+ok: [vpn-client1]
+
+TASK: [common | set hostname] ************************************************* 
+changed: [vpn-server1]
+changed: [vpn-client1]
+
+TASK: [common | install packages] ********************************************* 
+changed: [vpn-client1] => (item=openvpn,easy-rsa,chrony,rsync)
+changed: [vpn-server1] => (item=openvpn,easy-rsa,chrony,rsync)
+
+TASK: [common | enable chrony ntp client] ************************************* 
+ok: [vpn-server1]
+ok: [vpn-client1]
+
+TASK: [common | scp /etc/hosts] *********************************************** 
+changed: [vpn-server1]
+changed: [vpn-client1]
+
+PLAY [vpn-server1] ************************************************************ 
+
+GATHERING FACTS *************************************************************** 
+ok: [vpn-server1]
+
+TASK: [vpn_server | setup ufw default policy to accept] *********************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | allow ssh in ufw] ***************************************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | allow vpn port in ufw] ************************************ 
+changed: [vpn-server1] => (item={'subnet': '10.10.0.0', 'name': 'instance1', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1194})
+changed: [vpn-server1] => (item={'subnet': '10.11.0.0', 'name': 'instance2', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1198})
+changed: [vpn-server1] => (item={'subnet': '10.12.0.0', 'name': 'instance3', 'proto': 'tcp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 443})
+
+TASK: [vpn_server | setup ufw /etc/ufw/before.rules file] ********************* 
+changed: [vpn-server1]
+
+TASK: [vpn_server | enable ufw] *********************************************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | set /proc/sys/net/ipv4/ip_forward equal to 1] ************* 
+changed: [vpn-server1]
+
+TASK: [vpn_server | create /var/log/openvpn] ********************************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | generate openvpn server config file] ********************** 
+changed: [vpn-server1] => (item={'subnet': '10.10.0.0', 'name': 'instance1', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1194})
+changed: [vpn-server1] => (item={'subnet': '10.11.0.0', 'name': 'instance2', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1198})
+changed: [vpn-server1] => (item={'subnet': '10.12.0.0', 'name': 'instance3', 'proto': 'tcp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 443})
+
+TASK: [vpn_server | create {{key_dir}}] *************************************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | check if DH parameter file exist] ************************* 
+ok: [vpn-server1]
+
+TASK: [vpn_server | fail msg="DH file path is not a regular file, check /etc/openvpn/dh*.pem"] *** 
+skipping: [vpn-server1]
+
+TASK: [vpn_server | check if existing DH param file is valid] ***************** 
+skipping: [vpn-server1]
+
+TASK: [vpn_server | fail msg="DH file exists but it is not a valid one, pls check"] *** 
+skipping: [vpn-server1]
+
+TASK: [vpn_server | create dh file if it is not there (gonna take a while)] *** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | push ca.crt] ********************************************** 
+changed: [vpn-server1]
+
+TASK: [vpn_server | push endpoint key and cert] ******************************* 
+changed: [vpn-server1] => (item=key)
+changed: [vpn-server1] => (item=crt)
+
+TASK: [vpn_server | enable openvpn service] *********************************** 
+ok: [vpn-server1]
+
+TASK: [vpn_server | restart openvpn service] ********************************** 
+changed: [vpn-server1]
+
+PLAY [vpn-client1] ************************************************************ 
+
+GATHERING FACTS *************************************************************** 
+ok: [vpn-client1]
+
+TASK: [vpn_client | create /var/log/openvpn] ********************************** 
+changed: [vpn-client1]
+
+TASK: [vpn_client | generate openvpn client config] *************************** 
+changed: [vpn-client1] => (item={'subnet': '10.10.0.0', 'name': 'instance1', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1194})
+changed: [vpn-client1] => (item={'subnet': '10.11.0.0', 'name': 'instance2', 'proto': 'udp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 1198})
+changed: [vpn-client1] => (item={'subnet': '10.12.0.0', 'name': 'instance3', 'proto': 'tcp', 'vpn_server_ip': '139.162.39.177', 'subnet_mask': '255.255.0.0', 'subnet_mask_bit': 16, 'port': 443})
+
+TASK: [vpn_client | create {{key_dir}}] *************************************** 
+changed: [vpn-client1]
+
+TASK: [vpn_client | push ca.crt] ********************************************** 
+changed: [vpn-client1]
+
+TASK: [vpn_client | push client key] ****************************************** 
+changed: [vpn-client1]
+
+TASK: [vpn_client | push client cert] ***************************************** 
+changed: [vpn-client1]
+
+TASK: [vpn_client | push vpn_test.py] ***************************************** 
+changed: [vpn-client1]
+
+PLAY RECAP ******************************************************************** 
+mgmt                       : ok=14   changed=8    unreachable=0    failed=0   
+vpn-client1                : ok=13   changed=10   unreachable=0    failed=0   
+vpn-server1                : ok=21   changed=16   unreachable=0    failed=0
